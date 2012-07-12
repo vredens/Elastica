@@ -212,4 +212,23 @@ class Elastica_Search {
 
 		return new Elastica_ResultSet($response);
 	}
+
+	/**
+	 * Counts all documents in the set indices, types
+	 *
+	 * @param mixed     $query
+	 * @param int|array $options OPTIONAL Limit or associative array of options (option=>value)
+	 * @return Elastica_ResultSet
+	 */
+	public function count($query, $options = null) {
+
+		// ignore any other type of search count
+		if (is_int($options)) {
+			$options = array('limit' => $options);
+		}
+		$options['search_type'] = 'count';
+
+		$rs = $this->search($query, $options);
+		return (int) $rs->getTotalHits();
+	}
 }
