@@ -316,12 +316,15 @@ class Elastica_Query_Builder extends Elastica_Query_Abstract
 	 */
 	public function field($name, $value)
 	{
-		if (is_bool($value))
-		{
-			$value = var_export($value, true);
+		if (is_bool($value)) {
+			$value = '"'. var_export($value, true) . '"';
+		} else if (is_array($value)) {
+			$value = '["'.implode('","', $value).'"]';
+		} else {
+			$value = '"'.$value.'"';
 		}
 
-		$this->_string .= '"'.$name.'":"'.$value.'",';
+		$this->_string .= '"'.$name.'":'.$value.',';
 
 		return $this;
 	}
@@ -562,9 +565,18 @@ class Elastica_Query_Builder extends Elastica_Query_Abstract
 	 *
 	 * @return Elastica_Query_Builder
 	 */
-	public function minimumShouldMatch($minimum)
+	public function minimumNumberShouldMatch($minimum)
 	{
 		return $this->field('minimum_number_should_match', (int) $minimum);
+	}
+
+	/**
+	 * @see minimumNumberShouldMatch()
+	 * @deprecated
+	 */
+	public function minimumShouldMatch($minimum)
+	{
+        return $this->minimumNumberShouldMatch($minimum);
 	}
 
 	/**
@@ -828,6 +840,26 @@ class Elastica_Query_Builder extends Elastica_Query_Abstract
 			->close();
 	}
 
+    /**
+     * Sort on multiple fields
+     *
+     * @param array $fields Associative array where the keys are field names to sort on, and the
+     *                      values are the sort order: "asc" or "desc"
+     *
+     * @return Elastica_Query_Builder
+     */
+    public function sortFields(array $fields) {
+        $this->_string .= '"sort":[';
+
+        foreach ($fields as $fieldName => $order) {
+            $this->_string .= '{"'.$fieldName.'":"'.$order.'"},';
+        }
+
+        $this->_string = rtrim($this->_string, ',') . '],';
+
+        return $this;
+    }
+
 	/**
 	 * Term Query.
 	 *
@@ -881,9 +913,18 @@ class Elastica_Query_Builder extends Elastica_Query_Abstract
 	 *
 	 * @return Elastica_Query_Builder
 	 */
-	public function tieBreaker($multiplier)
+	public function tieBreakerMultiplier($multiplier)
 	{
 		return $this->field('tie_breaker_multiplier', (float) $multiplier);
+	}
+
+	/**
+	 * @see tieBreakerMultiplier
+	 * @deprecated
+	 */
+	public function tieBreaker($multiplier)
+	{
+        return $this->tieBreakerMultiplier($multiplier);
 	}
 
 	/**
