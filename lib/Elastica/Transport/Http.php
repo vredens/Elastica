@@ -50,6 +50,7 @@ class Elastica_Transport_Http extends Elastica_Transport_Abstract {
 		}
 
 		$baseUri .= $request->getPath();
+		$baseUri = preg_replace('/#/', '%23', $baseUri);
 
 		$query = $request->getQuery();
 
