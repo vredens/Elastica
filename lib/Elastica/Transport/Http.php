@@ -45,12 +45,12 @@ class Elastica_Transport_Http extends Elastica_Transport_Abstract {
 			}
 
 			$path = isset($params['path']) ? $params['path'] : '';
-
+			
 			$baseUri = $this->_scheme . '://' . $params['host'] . ':' . $params['port'] . '/' . $path;
 		}
 
 		$baseUri .= $request->getPath();
-		$baseUri = preg_replace('/#/', '%23', $baseUri);
+		$baseUri = str_replace('#', '%23', $baseUri);
 
 		$query = $request->getQuery();
 
