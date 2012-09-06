@@ -174,6 +174,15 @@ class Elastica_Request {
 
 		return new $className($this);
 	}
+	
+	/**
+	 * Resets any server that has been discovered from the server list. This is intended for long-run applications which
+	 * need to "forget" an elasticsearch host so that they perform proper load-balancing. For example, use this after insert
+	 * operations or after a set of searches.
+	 */
+	public static function resetServer() {
+		unset(self::$_serverId);
+	}
 
 	/**
 	 * Sends request to server
@@ -212,17 +221,29 @@ class Elastica_Request {
 			);
 			$response = $transport->exec($params);
 		} else {
-	
-			// Set server id for first request (round robin by default)
+			// discover a server 
 			if (is_null(self::$_serverId)) {
-				self::$_serverId = rand(0, count($servers) - 1);
-			} else {
-				self::$_serverId = (self::$_serverId + 1) % count($servers);
+				self::$_serverId = mt_rand(0, count($servers) - 1);
 			}
+			$tries = 0;
+			while ($tries < count($servers)) {
+				try {
+					// Set server id for first request (round robin by default)
 
-			$server = $servers[self::$_serverId];
+					$server = $servers[self::$_serverId];
 
-			$response = $transport->exec($server);
+					$response = $transport->exec($server);
+					
+					$tries = count($servers);
+				} catch (\Elastica_Exception_Client $e) {
+					// bad server, try another
+					self::$_serverId = (self::$_serverId + 1) % count($servers);
+					$tries++;
+					if ($tries >= count($servers)) {
+						throw $e;
+					}
+				}
+			}
 		}
 		
 		return $response;
