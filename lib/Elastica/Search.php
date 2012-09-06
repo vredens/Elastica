@@ -6,7 +6,8 @@
  * @package  Elastica
  * @author   Nicolas Ruflin <spam@ruflin.com>
  */
-class Elastica_Search {
+class Elastica_Search
+{
     /**
      * Array of indices
      *
@@ -33,17 +34,19 @@ class Elastica_Search {
      *
      * @param Elastica_Client $client Client object
      */
-    public function __construct(Elastica_Client $client) {
+    public function __construct(Elastica_Client $client)
+    {
         $this->_client = $client;
     }
 
     /**
      * Adds a index to the list
      *
-     * @param Elastica_Index|string $index Index object or string
-     * @return Elastica_Search Current object
+     * @param  Elastica_Index|string $index Index object or string
+     * @return Elastica_Search       Current object
      */
-    public function addIndex($index) {
+    public function addIndex($index)
+    {
         if ($index instanceof Elastica_Index) {
             $index = $index->getName();
         }
@@ -60,10 +63,11 @@ class Elastica_Search {
     /**
      * Add array of indices at once
      *
-     * @param array $indices
+     * @param  array           $indices
      * @return Elastica_Search
      */
-    public function addIndices(array $indices = array()) {
+    public function addIndices(array $indices = array())
+    {
         foreach ($indices as $index) {
             $this->addIndex($index);
         }
@@ -74,11 +78,12 @@ class Elastica_Search {
     /**
      * Adds a type to the current search
      *
-     * @param Elastica_Type|string $type Type name or object
-     * @return Elastica_Search Search object
+     * @param  Elastica_Type|string       $type Type name or object
+     * @return Elastica_Search            Search object
      * @throws Elastica_Exception_Invalid
      */
-    public function addType($type) {
+    public function addType($type)
+    {
         if ($type instanceof Elastica_Type) {
             $type = $type->getName();
         }
@@ -95,10 +100,11 @@ class Elastica_Search {
     /**
      * Add array of types
      *
-     * @param array $types
+     * @param  array           $types
      * @return Elastica_Search
      */
-    public function addTypes(array $types = array()) {
+    public function addTypes(array $types = array())
+    {
         foreach ($types as $type) {
             $this->addType($type);
         }
@@ -111,7 +117,8 @@ class Elastica_Search {
      *
      * @return Elastica_Client Client object
      */
-    public function getClient() {
+    public function getClient()
+    {
         return $this->_client;
     }
 
@@ -120,7 +127,8 @@ class Elastica_Search {
      *
      * @return array List of index names
      */
-    public function getIndices() {
+    public function getIndices()
+    {
         return $this->_indices;
     }
 
@@ -129,7 +137,8 @@ class Elastica_Search {
      *
      * @return array List of types
      */
-    public function getTypes() {
+    public function getTypes()
+    {
         return $this->_types;
     }
 
@@ -138,7 +147,8 @@ class Elastica_Search {
      *
      * @param Elastica_Searchable $searchObject
      */
-    public static function create(Elastica_Searchable $searchObject) {
+    public static function create(Elastica_Searchable $searchObject)
+    {
         throw new Elastica_Exception_NotImplemented();
         // Set index
         // set type
@@ -150,8 +160,8 @@ class Elastica_Search {
      *
      * @return string Search path
      */
-    public function getPath() {
-
+    public function getPath()
+    {
         $indices = $this->getIndices();
 
         $path = '';
@@ -175,12 +185,12 @@ class Elastica_Search {
     /**
      * Search in the set indices, types
      *
-     * @param mixed     $query
-     * @param int|array $options OPTIONAL Limit or associative array of options (option=>value)
+     * @param  mixed              $query
+     * @param  int|array          $options OPTIONAL Limit or associative array of options (option=>value)
      * @return Elastica_ResultSet
      */
-    public function search($query, $options = null) {
-
+    public function search($query, $options = null)
+    {
         $query = Elastica_Query::create($query);
         $path = $this->getPath();
         $params = array();
@@ -220,7 +230,8 @@ class Elastica_Search {
      * @param int|array $options OPTIONAL Limit or associative array of options (option=>value)
      * @return Elastica_ResultSet
      */
-    public function count($query, $options = null) {
+    public function count($query, $options = null)
+    {
 
         // ignore any other type of search count
         if (is_int($options)) {

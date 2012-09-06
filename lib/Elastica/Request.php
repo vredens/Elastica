@@ -6,8 +6,8 @@
  * @package Elastica
  * @author Nicolas Ruflin <spam@ruflin.com>
  */
-class Elastica_Request {
-
+class Elastica_Request
+{
     const POST = 'POST';
     const PUT = 'PUT';
     const GET = 'GET';
@@ -15,35 +15,35 @@ class Elastica_Request {
 
     /**
      * Client
-     * 
+     *
      * @var Elastica_Client Client object
      */
     protected $_client;
 
     /**
      * Request path
-     * 
+     *
      * @var string Request path
      */
     protected $_path;
 
     /**
      * Request method (use const's)
-     * 
+     *
      * @var string Request method (use const's)
      */
     protected $_method;
 
     /**
      * Data array
-     * 
+     *
      * @var array Data array
      */
     protected $_data;
 
     /**
      * Query params
-     * 
+     *
      * @var array Query params
      */
     protected $_query;
@@ -57,14 +57,15 @@ class Elastica_Request {
 
     /**
      * Construct
-     * 
+     *
      * @param Elastica_Client $client
-     * @param string $path Request path
-     * @param string $method Request method (use const's)
-     * @param array $data OPTIONAL Data array
-     * @param array $query OPTIONLA Query params
+     * @param string          $path   Request path
+     * @param string          $method Request method (use const's)
+     * @param array           $data   OPTIONAL Data array
+     * @param array           $query  OPTIONLA Query params
      */
-    public function __construct(Elastica_Client $client, $path, $method, $data = array(), array $query = array()) {
+    public function __construct(Elastica_Client $client, $path, $method, $data = array(), array $query = array())
+    {
         $this->_client = $client;
         $this->_path = $path;
         $this->_method = $method;
@@ -75,20 +76,23 @@ class Elastica_Request {
     /**
      * Sets the request method. Use one of the for consts
      *
-     * @param string $method Request method
+     * @param  string           $method Request method
      * @return Elastica_Request Current object
      */
-    public function setMethod($method) {
+    public function setMethod($method)
+    {
         $this->_method = $method;
+
         return $this;
     }
 
     /**
      * Get request method
-     * 
+     *
      * @return string Request method
      */
-    public function getMethod() {
+    public function getMethod()
+    {
         return $this->_method;
     }
 
@@ -97,55 +101,63 @@ class Elastica_Request {
      *
      * @param array $data Request data
      */
-    public function setData($data) {
+    public function setData($data)
+    {
         $this->_data = $data;
+
         return $this;
     }
 
     /**
      * Return request data
-     * 
+     *
      * @return array Request data
      */
-    public function getData() {
+    public function getData()
+    {
         return $this->_data;
     }
 
     /**
      * Sets the request path
      *
-     * @param string $path Request path
+     * @param  string           $path Request path
      * @return Elastica_Request Current object
      */
-    public function setPath($path) {
+    public function setPath($path)
+    {
         $this->_path = $path;
+
         return $this;
     }
 
     /**
      * Return request path
-     * 
+     *
      * @return string Request path
      */
-    public function getPath() {
+    public function getPath()
+    {
         return $this->_path;
     }
 
     /**
      * Return query params
-     * 
+     *
      * @return array Query params
      */
-    public function getQuery() {
+    public function getQuery()
+    {
         return $this->_query;
     }
 
     /**
      * Return Client Object
-     * 
+     *
      * @return Elastica_Client
      */
-    public function getClient() {
+    public function getClient()
+    {
         return $this->_client;
     }
 
@@ -153,10 +165,11 @@ class Elastica_Request {
      * Returns a specific config key or the whole
      * config array if not set
      *
-     * @param string $key Config key
+     * @param  string       $key Config key
      * @return array|string Config value
      */
-    public function getConfig($key = '') {
+    public function getConfig($key = '')
+    {
         return $this->getClient()->getConfig($key);
     }
 
@@ -164,9 +177,10 @@ class Elastica_Request {
      * Returns an instance of the transport type
      *
      * @return Elastica_Transport_Abstract Transport object
-     * @throws Elastica_Exception_Invalid If invalid transport type
+     * @throws Elastica_Exception_Invalid  If invalid transport type
      */
-    public function getTransport() {
+    public function getTransport()
+    {
         $className = 'Elastica_Transport_' . $this->_client->getConfig('transport');
         if (!class_exists($className)) {
             throw new Elastica_Exception_Invalid('Invalid transport');
@@ -180,7 +194,8 @@ class Elastica_Request {
      * need to "forget" an elasticsearch host so that they perform proper load-balancing. For example, use this after insert
      * operations or after a set of searches.
      */
-    public static function resetServer() {
+    public static function resetServer()
+    {
         unset(self::$_serverId);
     }
 
@@ -189,15 +204,14 @@ class Elastica_Request {
      *
      * @return Elastica_Response Response object
      */
-    public function send() {
-        
+    public function send()
+    {
         $log = new Elastica_Log($this->getClient());
         $log->log($this);
 
         $transport = $this->getTransport();
 
         $servers = $this->getClient()->getConfig('servers');
-        
         /*
 
         // Integration of temp file
@@ -211,7 +225,7 @@ class Elastica_Request {
         }
 
         */
-        
+
         if (empty($servers)) {
             $params = array(
                 'url' => $this->getClient()->getConfig('url'),
@@ -245,7 +259,7 @@ class Elastica_Request {
                 }
             }
         }
-        
+
         return $response;
     }
 }
