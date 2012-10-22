@@ -44,6 +44,13 @@ class Elastica_Document
     protected $_version = '';
 
     /**
+     * Document version type
+     *
+     * @var string Version_type
+     */
+    protected $_versionType = '';
+
+    /**
      * Parent document id
      *
      * @var string|int Parent document id
@@ -63,6 +70,13 @@ class Elastica_Document
      * @var string Percolate
      */
     protected $_percolate = '';
+
+    /**
+     * Routing
+     *
+     * @var string Routing
+     */
+    protected $_routing = null;
 
     /**
      * Creates a new document
@@ -88,6 +102,18 @@ class Elastica_Document
     public function getId()
     {
         return $this->_id;
+    }
+
+    /**
+     * Sets the id of the document.
+     *
+     * @param string $id
+     * @return Elastica_Document
+     */
+    public function setId($id)
+    {
+        $this->_id = $id;
+        return $this;
     }
 
     /**
@@ -286,6 +312,33 @@ class Elastica_Document
     }
 
     /**
+     * Sets the version_type of a document
+     * Default in ES is internal, but you can set to external to use custom versioning
+     *
+     * @param  int               $version Document version
+     * @return Elastica_Document Current object
+     * @link http://www.elasticsearch.org/guide/reference/api/index_.html
+     */
+    public function setVersionType($versionType)
+    {
+        if ($versionType !== '') {
+            $this->_versionType = $versionType;
+        }
+
+        return $this;
+    }
+
+    /**
+     * Returns document version type
+     *
+     * @return string|int Document version type
+     */
+    public function getVersionType()
+    {
+        return $this->_versionType;
+    }
+
+    /**
      * Sets parent document id
      *
      * @param  string|int        $parent Parent document id
@@ -354,6 +407,29 @@ class Elastica_Document
     }
 
     /**
+     * Set routing query param
+     *
+     * @param  string            $value routing
+     * @return Elastica_Document
+     */
+    public function setRouting($value)
+    {
+        $this->_routing = $value;
+
+        return $this;
+    }
+
+    /**
+     * Get routing parameter
+     *
+     * @return string
+     */
+    public function getRouting()
+    {
+        return $this->_routing;
+    }
+
+    /**
      * Returns the document as an array
      * @return array
      */
@@ -378,9 +454,19 @@ class Elastica_Document
             $doc['_version'] = $version;
         }
 
+        $versionType = $this->getVersionType();
+        if (!empty($versionType)) {
+            $doc['_version_type'] = $versionType;
+        }
+
         $parent = $this->getParent();
         if (!is_null($parent)) {
             $doc['_parent'] = $parent;
+        }
+
+        $routing = $this->getRouting();
+        if (!is_null($routing)) {
+            $doc['_routing'] = $routing;
         }
 
         $doc['_source'] = $this->getData();
