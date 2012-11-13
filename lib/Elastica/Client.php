@@ -392,6 +392,53 @@ class Elastica_Client
     }
 
     /**
+     * Multi-Search operation
+     *
+     * Every entry in the params array has to be exactly one array
+     * of the multi-search operation. An example param array would be:
+     *
+     * array(
+     *      array('index' => 'test'),
+     * 		array('query' => array('match' => 'cows'))
+     *      array('index' => 'test'),
+     * 		array('query' => array('match' => 'pigs'), 'size' => 100)
+     * );
+     *
+     * @param  array             $params Parameter array
+     * @return Elastica_Response Reponse object
+     * @todo Test
+     * @link http://www.elasticsearch.org/guide/reference/api/multi-search.html
+     */
+    public function msearch(array $params)
+    {
+        if (empty($params)) {
+            throw new Elastica_Exception_Invalid('Array has to consist of at least one param');
+        }
+
+        $path = '_msearch';
+
+        $queryString = '';
+        foreach ($params as $index => $baseArray) {
+            // Always newline needed
+            $queryString .= json_encode($baseArray) . PHP_EOL;
+        }
+
+        $response = $this->request($path, Elastica_Request::GET, $queryString);
+        $data = $response->getData();
+
+        if (isset($data['items'])) {
+            foreach ($data['items'] as $item) {
+                $params = reset($item);
+                if (isset($params['error'])) {
+                    throw new Elastica_Exception_BulkResponse($response);
+                }
+            }
+        }
+
+        return $response;
+    }
+
+    /**
      * Makes calls to the elasticsearch server based on this index
      *
      * It's possible to make any REST query directly over this method
