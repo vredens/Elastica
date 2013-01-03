@@ -239,27 +239,32 @@ class Elastica_Type implements Elastica_Searchable
      * Deletes an entry by its unique identifier
      *
      * @param  int|string        $id Document id
+     * @param  string            $routing (optional) routing
      * @return Elastica_Response Response object
      * @link http://www.elasticsearch.org/guide/reference/api/delete.html
      */
-    public function deleteById($id)
+    public function deleteById($id, $routing = null)
     {
         if (empty($id) || !trim($id)) {
             throw new InvalidArgumentException();
         }
+        
+        $options = array();
+        if (isset($routing)) $options['routing'] = $routing;
 
-        return $this->request($id, Elastica_Request::DELETE);
+        return $this->request($id, Elastica_Request::DELETE, array(), $options);
     }
 
     /**
      * Deletes the given list of ids from this type
      *
      * @param  array             $ids
+     * @param  string            $routing (optional) routing value
      * @return Elastica_Response Response object
      */
-    public function deleteIds(array $ids)
+    public function deleteIds(array $ids, $routing)
     {
-        return $this->getIndex()->getClient()->deleteIds($ids, $this->getIndex(), $this);
+        return $this->getIndex()->getClient()->deleteIds($ids, $this->getIndex(), $this, $routing);
     }
 
     /**

@@ -311,11 +311,12 @@ class Elastica_Client
      * @param  array                 $ids   Document ids
      * @param  string|Elastica_Index $index Index name
      * @param  string|Elastica_Type  $type  Type of documents
+     * @param  string                $routing To speed up deletes
      * @return Elastica_Response     Response object
      * @throws Elastica_Exception    If ids is empty
      * @link http://www.elasticsearch.com/docs/elasticsearch/rest_api/bulk/
      */
-    public function deleteIds(array $ids, $index, $type)
+    public function deleteIds(array $ids, $index, $type, $routing = null)
     {
         if (empty($ids)) {
             throw new Elastica_Exception_Invalid('Array has to consist of at least one id');
@@ -338,6 +339,9 @@ class Elastica_Client
                     '_id' => $id,
                 )
             );
+            if (isset($routing)) {
+                $action['delete']['_routing'] = $routing;
+            }
 
             $params[] = $action;
         }
