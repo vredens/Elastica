@@ -443,6 +443,40 @@ class Elastica_Client
     }
 
     /**
+     * Multi-Get operation
+     *
+     * Every entry in the params array has to be exactly one array
+     * of the multi-get operation. An example param array would be:
+     *
+     * array(
+     *      array('_index' => $index, 'type' => $type, '_id' => $id1),
+     *      array('_index' => $index, 'type' => $type, '_id' => $id2),
+     *      array('_index' => $index, 'type' => $type, '_id' => $id3),
+     * );
+     *
+     * @param  array             $params Parameter array
+     * @return Elastica_Response Reponse object
+     * @todo Test
+     * @link http://www.elasticsearch.org/guide/reference/api/multi-search.html
+     */
+    public function mget($index, $type, array $params)
+    {
+        if (empty($params)) {
+            throw new Elastica_Exception_Invalid('Array has to consist of at least one param');
+        }
+
+        $path = '';
+        if (isset($index)) $path .= $index . '/';
+        if (isset($type)) $path .= $type . '/';
+        $path .= '_mget';
+
+        $response = $this->request($path, Elastica_Request::GET, json_encode($params));
+        $data = $response->getData();
+
+        return $data;
+    }
+
+    /**
      * Makes calls to the elasticsearch server based on this index
      *
      * It's possible to make any REST query directly over this method
